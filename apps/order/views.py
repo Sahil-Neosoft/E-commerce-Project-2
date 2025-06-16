@@ -1,3 +1,168 @@
-from django.shortcuts import render
+from decimal import Decimal
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+from main.forms import CheckoutForm
+from .models import Order
+from apps.product.models import Product, Size, Color
+from apps.cart.models import CartItem
+#from cart.utils import get_or_create_cart
 
-# Create your views here.
+@login_required
+def checkout_view(request):
+    """Checkout process"""
+    cart = None #get_or_create_cart(request)
+
+    if not cart.items.exists():
+        messages.warning(request, 'Your cart is empty.')
+        return redirect('cart')
+    
+    # Check stock availability for all items
+    for item in cart.items.all():
+        if not item.product.can_order(item.quantity):
+            messages.error(
+                request,
+                f'Sorry, {item.product.name} is out of stock or has insufficient quantity.'
+            )
+            return redirect('cart')
+    
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            # Create address dictionary
+            address = {
+                'full_name': form.cleaned_data['full_name'],
+                'email': form.cleaned_data['email'],
+                'telephone': form.cleaned_data['telephone'],
+                'address_line_1': form.cleaned_data['address_line_1'],
+                'address_line_2': form.cleaned_data['address_line_2'],
+                'city': form.cleaned_data['city'],
+                'postal_code': form.cleaned_data['postal_code'],
+                'country': form.cleaned_data['country'],
+            }
+            
+            # Calculate shipping (you can implement your own logic)
+            shipping_cost = Decimal('10.00')  # Fixed shipping for now
+            
+            # Create order
+            order = Order.create_from_cart(cart, address, shipping_cost)
+            
+            if order:
+                messages.success(request, f'Order {order.order_number} placed successfully!')
+                return redirect('order_detail', order_number=order.order_number)
+            else:
+                messages.error(request, 'Error placing order. Please try again.')
+    else:
+        # Pre-fill form with user data
+        initial_data = {
+            'full_name': request.user.get_full_name(),
+            'email': request.user.email,
+        }
+        form = CheckoutForm(initial=initial_data)
+    
+    context = {
+        'form': form,
+        'cart': cart,
+        'cart_items': cart.items.select_related('product').all(),
+        'subtotal': cart.get_total_price(),
+        'shipping_cost': Decimal('10.00'),
+        'total': cart.get_total_price() + Decimal('10.00'),
+    }
+    return render(request, 'store/checkout.html', context)
+
+def buy_now(request):
+    """Buy now view for quick purchase"""
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity', 1))
+        size_id = request.POST.get('size')
+        color_id = request.POST.get('color')
+        
+        # Get the product and check if it can be ordered
+        product = get_object_or_404(Product, id=product_id, is_active=True)
+        if product.sizes.exists():
+            if not size_id == '':
+                size = get_object_or_404(Size, id=size_id, product=product)
+            else:
+                messages.error(request, 'Please select a size.')
+                return redirect('product_detail', slug=product.slug)
+        if product.colors.exists():
+            if not color_id == '':
+                color = get_object_or_404(Color, id=color_id, product=product)
+            else:
+                messages.error(request, 'Please select a color.')
+                return redirect('product_detail', slug=product.slug)
+
+        if not product.can_order(quantity):
+            messages.error(request, f'Sorry, {product.name} is out of stock or has insufficient quantity.')
+            return redirect('product_detail', slug=product.slug)
+        
+        # Create a temporary cart item
+        cart_item = CartItem.objects.create(
+            product=product,
+            quantity=quantity,
+            user=request.user
+        )
+        
+        # Redirect to checkout with the temporary cart item
+        return redirect('checkout')
+    
+    messages.error(request, 'Invalid request.')
+    return redirect('home')
+
+
+# ============================================================================
+# ORDER VIEWS
+# ============================================================================
+
+@login_required
+def order_list_view(request):
+    """List user's orders"""
+    orders = request.user.get_orders()
+    
+    paginator = Paginator(orders, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'orders': page_obj,
+    }
+    return render(request, 'store/order_list.html', context)
+
+
+@login_required
+def order_detail_view(request, order_number):
+    """Order detail view"""
+    order = get_object_or_404(
+        Order,
+        order_number=order_number,
+        user=request.user
+    )
+    
+    order_items = order.items.select_related('product', 'size', 'color').all()
+    
+    context = {
+        'order': order,
+        'order_items': order_items,
+    }
+    return render(request, 'store/order_detail.html', context)
+
+
+@login_required
+@require_POST
+def cancel_order(request, order_number):
+    """Cancel an order"""
+    order = get_object_or_404(
+        Order,
+        order_number=order_number,
+        user=request.user
+    )
+    
+    if order.cancel_order():
+        messages.success(request, f'Order {order.order_number} has been cancelled.')
+    else:
+        messages.error(request, 'This order cannot be cancelled.')
+    
+    return redirect('order_detail', order_number=order.order_number)

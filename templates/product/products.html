@@ -1,0 +1,20 @@
+
+{% extends "layout.html" %}
+{% load nix %}
+
+{% block title %}Nixagone - Products{% endblock title %}
+
+{% block main_content %}
+<div class="mx-auto">
+    {% include "partials/heading.html" with title="Products" %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+            {% product_card product %}
+        {% endfor %}
+    </div>
+    <div class="mt-8">
+        {% include "partials/pagination.html" %}
+    </div>
+</div>
+{% endblock main_content %}
+

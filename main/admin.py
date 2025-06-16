@@ -70,13 +70,13 @@ class SizeInline(admin.TabularInline):
 class ColorInline(admin.TabularInline):
     model = Color
     extra = 1
-    fields = ('name',)
+    fields = ('name', 'hex_code')
 
 
 class ImageInline(admin.TabularInline):
     model = Image
     extra = 1
-    fields = ('image', 'alt_text', 'is_primary', 'image_preview')
+    fields = ('image_preview', 'image', 'alt_text', 'is_primary' )
     readonly_fields = ('image_preview',)
 
     def image_preview(self, obj):
@@ -197,9 +197,9 @@ class ProductAdmin(admin.ModelAdmin):
 
     def primary_image_preview(self, obj):
         primary_image = obj.get_primary_image()
-        if primary_image and primary_image.image:
+        if primary_image:
             return format_html(
-                '<img src="{}" style="width: 100px; height: 100px; object-fit: cover;" />',
+                '<img src="{}" style="width: 64px; height: 64px; object-fit: cover;" />',
                 primary_image.image.url
             )
         return "No Primary Image"

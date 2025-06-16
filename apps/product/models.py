@@ -21,14 +21,14 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('category_detail', kwargs={'slug': self.slug})
+        return reverse('category', kwargs={'slug': self.slug})
 
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
-    short_description = models.CharField(max_length=300, blank=True)
+    short_description = models.TextField(blank=True)
     description = models.TextField(blank=True)
     price = models.IntegerField(validators=[MinValueValidator(0)])
     sku = models.CharField(max_length=50, unique=True)
@@ -56,9 +56,14 @@ class Product(models.Model):
         """Check if quantity can be ordered"""
         return self.is_active and self.stock_quantity >= quantity
 
+    def get_primary_image_url(self):
+        """Get primary product image URL"""
+        return self.images.filter(is_primary=True).first().image.url
+    
     def get_primary_image(self):
         """Get primary product image"""
         return self.images.filter(is_primary=True).first()
+
 
     def get_all_images(self):
         """Get all product images"""

@@ -1,0 +1,17 @@
+{% if products.has_previous %}
+<a
+  href="?page={{ products.previous_page_number }}"
+  class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+  >Previous</a
+>
+{% endif %}
+<span class="mx-2"
+  >Page {{ products.number }} of {{ products.paginator.num_pages }}</span
+>
+{% if products.has_next %}
+<a
+  href="?page={{ products.next_page_number }}"
+  class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+  >Next</a
+>
+{% endif %}

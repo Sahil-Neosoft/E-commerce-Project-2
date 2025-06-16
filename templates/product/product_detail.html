@@ -1,0 +1,189 @@
+{% extends "layout.html" %} 
+{% load static %} 
+{% load nix %} 
+{% block title %}{{ product.name }} - Nixagone{% endblock title %} 
+{% block main_content %}
+<section
+  class="border-b container flex-grow lg:grid lg:grid-cols-2 lg:py-10 mx-auto py-5"
+  x-data="{
+    quantity: 1,
+    selectedSize: null,
+    selectedColor: null,
+    selectedImage: '{{ product.get_primary_image_url }}',
+    showColorName: false,
+    hoveredColorId: null,
+    
+    incrementQuantity() {
+      this.quantity++;
+    },
+    
+    decrementQuantity() {
+      if (this.quantity > 1) {
+        this.quantity--;
+      }
+    },
+    
+    selectSize(size) {
+      this.selectedSize = size;
+    },
+    
+    selectColor(color) {
+      this.selectedColor = color;
+    },
+    
+    selectImage(imageUrl) {
+      this.selectedImage = imageUrl;
+    },
+    
+    addToCart() {
+      // Add your cart logic here
+      console.log('Adding to cart:', {
+        product: '{{ product.id }}',
+        quantity: this.quantity,
+        size: this.selectedSize,
+        color: this.selectedColor
+      });
+    },
+    
+    buyNow() {
+      // change the parent forms action to the buy_now URL and 
+      console.log('Buy now:', {
+        product: '{{ product.id }}',
+        quantity: this.quantity,
+        size: this.selectedSize,
+        color: this.selectedColor
+      });
+    }
+  }"
+>
+  <div class="container mx-auto">
+    <img 
+      class="w-full" 
+      :src="selectedImage" 
+      alt="{{ product.name }}" 
+    />
+    <div class="gap-4 flex mt-3">
+        
+        {% for image in product.get_all_images %}
+            <div 
+              class="cursor-pointer"
+              @click="selectImage('{{ image.image.url }}')"
+            >
+              <img
+                class="w-full aspect-square max-w-28 object-cover"
+                :class="{ 'ring-2 ring-black': selectedImage === '{{ image.image.url }}' }"
+                src="{{ image.image.url }}"
+                alt="product image"
+              />
+            </div>
+        {% endfor %}
+    </div>
+  </div>
+  <div class="lg:px-5 mx-auto px-2 lg:pt-0 pt-8">
+    <h2 class="font-bold lg:pt-0 pt-3 text-2xl">{{ product.name }}</h2>
+    <p class="font-bold mt-5">
+      {% stock_status product show_stock_count=True %}
+    </p>
+    <p class="text-gray-500 mt-2">SKU: <span class="font-normal">{{ product.sku }}</span></p>
+    <p class="font-bold mt-4 text-4xl text-green-600">
+      {{ product.price|taka }}
+    </p>
+    <p class="leading-6 pt-5 text-gray-700">
+        {{ product.short_description|safe }}
+    </p>
+    {% if product.sizes.exists %}
+    <div class="mt-6">
+      <p class="pb-2 text-gray-500 text-xs">Size</p>
+      <div class="flex gap-2">
+        {% for size in product.sizes.all %}
+          <div
+            class="active:ring-2 active:ring-gray-500 border cursor-pointer duration-100 flex focus:ring-2 focus:ring-gray-500 h-8 hover:bg-neutral-100 items-center justify-center min-w-8 transition-colors"
+            :class="{ 'ring-2 ring-offset-1 ring-black': selectedSize === '{{ size.id }}' }"
+            @click="selectSize('{{ size.id }}')"
+          >
+            {{ size.name }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if product.colors.exists %}
+    <div class="mt-6">
+      <p class="pb-2 text-gray-500 text-xs">Color</p>
+      <div class="flex gap-2 relative">
+        {% for color in product.colors.all %}
+          <div
+            class="group active:ring-2 active:ring-gray-500 border {% if color.name|lower == "white" %} border-gray-300 {% else %} border-[{{ color.hex_code }}] {% endif %} transition duration-100 cursor-pointer focus:ring-2 focus:ring-gray-500 h-8 w-8 relative"
+            :class="{ 'ring-2 ring-black ring-offset-1': selectedColor === '{{ color.id }}' }"
+            style="background-color: {{ color.hex_code }};"
+            title="{{ color.name }}"
+            @click="selectColor('{{ color.id }}')"
+            @mouseenter="hoveredColorId = {{ color.id }}"
+            @mouseleave="hoveredColorId = null"
+          >
+            <div 
+              class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+              x-show="hoveredColorId === {{ color.id }}"
+              x-transition
+            >
+              {{ color.name }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="mt-6">
+      <p class="pb-2 text-gray-500 text-xs">Quantity</p>
+      <div class="flex">
+        <button
+          class="active:ring-2 active:ring-gray-500 border cursor-pointer duration-100 flex focus:ring-2 focus:ring-gray-500 h-8 hover:bg-neutral-100 items-center justify-center w-8"
+          @click="decrementQuantity()"
+          :disabled="quantity <= 1"
+          :class="{ 'opacity-50 cursor-not-allowed': quantity <= 1 }"
+        >
+          −
+        </button>
+        <div
+          class="active:ring-gray-500 border-b border-t cursor-text flex h-8 items-center justify-center w-8"
+          x-text="quantity"
+        >
+        </div>
+        <button
+          class="active:ring-2 active:ring-gray-500 border cursor-pointer duration-100 flex focus:ring-2 focus:ring-gray-500 h-8 hover:bg-neutral-100 items-center justify-center w-8"
+          @click="incrementQuantity()"
+        >
+          +
+        </button>
+      </div>
+    </div>
+    <form action="{% url "add_to_cart" %}" method="post" class="flex flex-row gap-6 items-center mt-7">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" :value="{{product.id}}">
+        <input type="hidden" name="quantity" x-model="quantity">
+        <input type="hidden" name="size" :value="selectedSize">
+        <input type="hidden" name="color" :value="selectedColor">
+      <button
+        type="submit"
+        class="bg-black duration-100 flex gap-2 py-3 px-5 hover:bg-gray-800 items-center justify-center text-white transition-colors"
+        @click="addToCart()"
+      >
+        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        Add to cart
+      </button>
+      {% comment %} <button
+        class="bg-amber-400 duration-100 flex h-12 hover:bg-yellow-300 items-center justify-center w-1/3 transition-colors"
+        @click="buyNow()"
+      >
+        Buy now
+      </button> {% endcomment %}
+    </form>
+  </div>
+</section>
+<section class="container lg:py-10 max-w-[1200px] mx-auto px-2 py-5">
+    <h2 class="text-xl">Product details</h2>
+    <p class="lg:w-3/4 mt-4">{{ product.description|safe }}</p>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Nixagone{% endblock title %}
+
+
+
+{% block content %}
+    {% include "partials/header.html" %}
+    {% include "partials/alert.html" %}
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        {% block main_content %}
+        <!-- Main content goes here -->
+        {% endblock main_content %}
+    </main>
+
+    {% include "partials/footer.html" %}
+{% endblock content %}

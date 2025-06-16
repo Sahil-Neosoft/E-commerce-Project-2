@@ -1,0 +1,20 @@
+
+{% load static %}
+{% load nix %}
+<div class="bg-white max-w-80">
+    <div class="w-full aspect-square bg-gray-100">
+        <a href="{{ product.get_absolute_url }}" class="block w-full h-full">
+            {% if product.get_primary_image_url %}
+                <img src="{{ product.get_primary_image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+            {% else %}
+                <img src="https://placehold.co/150" alt="No image" class="w-full h-full object-cover">
+            {% endif %}
+        </a>
+    </div>
+    <div class="p-4">
+        <a href="{{ product.get_absolute_url }}" class="text-gray-800 font-semibold text-lg line-clamp-1 mb-2">{{ product.name }}</a>
+        <p class="text-gray-600 line-clamp-2 mb-1">{{ product.short_description }}</p>
+        <span class="text-black">{{ product.price|taka }}</span>
+        {% stock_status product %}
+    </div>
+</div>
