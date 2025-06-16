@@ -67,3 +67,76 @@ body {
 .float-animation {
     animation: float 3s ease-in-out infinite;
 }
+
+
+.bg.relative {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+.bg.relative > svg {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+}
+
+/* Randomized positions for each SVG icon */
+.bg.relative > svg:nth-child(1) {
+    top: 19%;
+    left: 8%;
+    transform: rotate(13deg);
+}
+.bg.relative > svg:nth-child(2) {
+    top: 22%;
+    left: 78%;
+    transform: rotate(-8deg);
+}
+.bg.relative > svg:nth-child(3) {
+    top: 82%;
+    left: 12%;
+    transform: rotate(21deg);
+}
+.bg.relative > svg:nth-child(4) {
+    top: 54%;
+    left: 80%;
+    transform: rotate(-17deg);
+}
+.bg.relative > svg:nth-child(5) {
+    top: 65%;
+    left: 50%;
+    transform: rotate(7deg);
+}
+.bg.relative > svg:nth-child(6) {
+    top: 60%;
+    left: 13%;
+    transform: rotate(-12deg);
+}
+.bg.relative > svg:nth-child(7) {
+    top: 25%;
+    left: 43%;
+    transform: rotate(18deg);
+}
+.bg.relative > svg:nth-child(8) {
+    top: 84%;
+    left: 42%;
+    transform: rotate(-23deg);
+}
+.bg.relative > svg:nth-child(9) {
+    top: 40%;
+    left: 22%;
+    transform: rotate(11deg);
+}
+.bg.relative > svg:nth-child(10) {
+    top: 42%;
+    left: 68%;
+    transform: rotate(3deg);
+}
+.bg.relative > svg:nth-child(11) {
+    top: 77%;
+    left: 77%;
+    transform: rotate(-15deg);
+}

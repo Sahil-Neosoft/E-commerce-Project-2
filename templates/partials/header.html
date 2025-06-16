@@ -1,6 +1,8 @@
 {% load nix %}
 {% load static %}
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-glass border-b border-gray-200/50 shadow-sm" x-data="{ 
+<header 
+class="sticky top-0 z-50 border-gray-200 bg-white/95 backdrop-blur-glass"
+x-data="{ 
         mobileMenuOpen: false, 
         searchOpen: false, 
         cartCount: {% get_cart_item_count request %},
@@ -147,3 +149,15 @@
             </nav>
         </div>
     </header>
+    <script>
+        const header = document.querySelector('header');
+        const scrollThreshold = 100; // Example threshold
+
+        window.addEventListener('scroll', () => {
+        if (window.scrollY > scrollThreshold) {
+            header.classList.add('border-b');
+        } else {
+            header.classList.remove('border-b');
+        }
+        });
+    </script>
