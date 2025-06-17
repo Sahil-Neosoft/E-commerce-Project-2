@@ -3,6 +3,15 @@ from django.core.validators import MinValueValidator
 from main.models import User
 from apps.product.models import Product, Size, Color
 
+class Address(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=20)
+    district = models.CharField(max_length=100)
+    address = models.TextField()
+
+    def __str__(self):
+        return f'{self.district} - {self.address}'
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -27,7 +36,7 @@ class Order(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
-    full_address = models.JSONField()
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     shipped_at = models.DateTimeField(null=True, blank=True)
 
@@ -43,7 +52,7 @@ class Order(models.Model):
         """Generate unique order number"""
         import random
         while True:
-            order_number = f"ORD-{random.randint(100000, 999999)}"
+            order_number = f"ORD-{random.randint(1000000, 9999999)}"
             if not Order.objects.filter(order_number=order_number).exists():
                 return order_number
 
@@ -90,7 +99,7 @@ class Order(models.Model):
             subtotal=subtotal,
             shipping_cost=shipping_cost,
             total_amount=total_amount,
-            full_address=address
+            address=address
         )
 
         # Create order items and reduce stock

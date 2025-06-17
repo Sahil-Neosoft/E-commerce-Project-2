@@ -52,6 +52,14 @@ body {
     animation: pulse 2s infinite;
 }
 
+.required::after {
+    content: "*";
+    color: red;
+    margin-left: 2px;
+    display: block;
+    font-size: small;
+}
+
 @keyframes float {
 
     0%,

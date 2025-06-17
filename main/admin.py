@@ -11,8 +11,6 @@ from apps.cart.models import Cart, CartItem
 from .models import User
 
 
-
-
 # Custom Admin Site Configuration
 admin.site.site_header = "E-commerce Admin Dashboard"
 admin.site.site_title = "E-commerce Admin"
@@ -149,8 +147,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'category', 'price', 'stock_status', 'stock_quantity', 
-        'is_active', 'primary_image_preview', 'created_at'
+        'primary_image_preview', 'name', 'category', 'price', 'stock_status', 'stock_quantity', 
+        'is_active'
     )
     list_filter = ('is_active', 'category', StockLevelFilter, 'created_at')
     search_fields = ('name', 'sku', 'description')
@@ -318,7 +316,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('subtotal', 'shipping_cost', 'total_amount')
         }),
         ('Shipping Information', {
-            'fields': ('full_address', 'shipped_at')
+            'fields': ('address', 'shipped_at')
         }),
         ('Timestamps', {
             'fields': ('created_at',),

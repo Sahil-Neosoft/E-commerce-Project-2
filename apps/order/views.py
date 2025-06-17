@@ -1,19 +1,18 @@
-from decimal import Decimal
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from main.forms import CheckoutForm
-from .models import Order
+from .models import Order, OrderItem, Address
 from apps.product.models import Product, Size, Color
 from apps.cart.models import CartItem
-#from cart.utils import get_or_create_cart
+from apps.cart.views import get_or_create_cart
 
-@login_required
 def checkout_view(request):
     """Checkout process"""
-    cart = None #get_or_create_cart(request)
+    cart = get_or_create_cart(request)
 
     if not cart.items.exists():
         messages.warning(request, 'Your cart is empty.')
@@ -29,48 +28,49 @@ def checkout_view(request):
             return redirect('cart')
     
     if request.method == 'POST':
-        form = CheckoutForm(request.POST)
-        if form.is_valid():
-            # Create address dictionary
-            address = {
-                'full_name': form.cleaned_data['full_name'],
-                'email': form.cleaned_data['email'],
-                'telephone': form.cleaned_data['telephone'],
-                'address_line_1': form.cleaned_data['address_line_1'],
-                'address_line_2': form.cleaned_data['address_line_2'],
-                'city': form.cleaned_data['city'],
-                'postal_code': form.cleaned_data['postal_code'],
-                'country': form.cleaned_data['country'],
-            }
-            
-            # Calculate shipping (you can implement your own logic)
-            shipping_cost = Decimal('10.00')  # Fixed shipping for now
-            
-            # Create order
-            order = Order.create_from_cart(cart, address, shipping_cost)
-            
-            if order:
-                messages.success(request, f'Order {order.order_number} placed successfully!')
-                return redirect('order_detail', order_number=order.order_number)
-            else:
-                messages.error(request, 'Error placing order. Please try again.')
-    else:
-        # Pre-fill form with user data
-        initial_data = {
-            'full_name': request.user.get_full_name(),
-            'email': request.user.email,
-        }
-        form = CheckoutForm(initial=initial_data)
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        district = request.POST.get('district')
+
+        if name == '' or email == '' or phone == '' or address == '' or district == '':
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('checkout')
+
+        # Create address
+        address = Address.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            district=district,
+            address=address,
+        )
+        # Calculate shipping 
+        shipping_cost = settings.SHIPPING_COST_DHAKA if district == 'Dhaka' else settings.SHIPPING_COST 
+        
+        # Create order
+        order = Order.create_from_cart(cart, address, shipping_cost)
+        
+        if order:
+            messages.success(request, f'Order {order.order_number} placed successfully!')
+            return redirect('index') #order_number=order.order_number
+        else:
+            messages.error(request, 'Error placing order. Please try again.')
+
+    districts = [
+        'Dhaka',
+        'Rangpur',
+        'Kumilla'
+    ]
     
     context = {
-        'form': form,
         'cart': cart,
+        'districts': districts,
         'cart_items': cart.items.select_related('product').all(),
         'subtotal': cart.get_total_price(),
-        'shipping_cost': Decimal('10.00'),
-        'total': cart.get_total_price() + Decimal('10.00'),
     }
-    return render(request, 'store/checkout.html', context)
+    return render(request, 'order/checkout.html', context)
 
 def buy_now(request):
     """Buy now view for quick purchase"""

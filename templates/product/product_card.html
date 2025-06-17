@@ -12,9 +12,9 @@
         </a>
     </div>
     <div class="p-4">
-        <a href="{{ product.get_absolute_url }}" class="text-gray-800 font-semibold text-lg line-clamp-1 mb-2">{{ product.name }}</a>
-        <p class="text-gray-600 line-clamp-2 mb-1">{{ product.short_description }}</p>
-        <span class="text-black">{{ product.price|taka }}</span>
+        <a href="{{ product.get_absolute_url }}" class="text-gray-800 font-semibold text-lg line-clamp-1 mb-3">{{ product.name }}</a>
+        <p class="text-gray-600 text-sm line-clamp-2 mb-2">{{ product.short_description }}</p>
+        <span class="text-black font-semibold">{{ product.price|taka }}</span>
         {% stock_status product %}
     </div>
 </div>

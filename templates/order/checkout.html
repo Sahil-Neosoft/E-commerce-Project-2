@@ -1,0 +1,137 @@
+{% extends "layout.html" %} 
+{% load nix %} 
+{% block title %}Checkout - Nixagone{% endblock title %} 
+{% block main_content %}
+<form action="{% url "checkout" %}" method="post"
+x-data="{
+    deliveryCost: 'select a district',
+    totalCost: '{{subtotal}}',
+    updateDeliveryCost(event) {
+        const district = event.target.value;
+        if (district === 'Dhaka') {
+            this.deliveryCost = '{{80|taka}}';
+            this.totalCost = {{subtotal}} + 80;
+        } else if (district) {
+            this.deliveryCost = '{{120|taka}}';
+            this.totalCost = {{subtotal}} + 120;
+        } else {
+            this.deliveryCost = 'select a district';
+            this.totalCost = {{subtotal}};
+        }
+    }
+}" 
+  class="container lg:flex lg:flex-col lg:py-10 max-w-[1200px] mx-auto py-5"
+>
+{% csrf_token %}
+  {% include "partials/heading.html" with title="Checkout" %}
+  <section class="gap-3 grid grid-cols-1 max-w-[1200px] mb-6 w-full">
+    <div class="py-5">
+      <div class="flex flex-col gap-3 w-full">
+        <div class="flex gap-2 justify-between w-full">
+          <div class="flex flex-col w-1/2">
+            <label class="flex" for="name">
+              Full Name<span class="required">*</span>
+            </label>
+            <input
+              class="border outline-black outline-offset-2 focus:border-transparent px-4 py-2 w-full"
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Name..."
+              autocomplete="name"
+              required
+            />
+          </div>
+          <div class="flex flex-col w-1/2">
+            <label class="flex" for="phone">
+              Phone<span class="required">*</span>
+            </label>
+            <input
+              class="border outline-black outline-offset-2 focus:border-transparent px-4 py-2 w-full"
+              type="tel"
+              name="phone"
+              id="phone"
+              placeholder="Phone number..."
+              required
+            />
+          </div>
+        </div>
+        <div class="flex gap-2 justify-between w-full">
+          <div class="flex flex-col w-full">
+            <label class="flex" for="email">
+              E-mail (optional)
+            </label>
+            <input
+              class="border outline-black outline-offset-2 focus:border-transparent px-4 py-2 w-full"
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Email address..."
+            />
+          </div>
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="flex" for="district">
+            District <span class="required">*</span>
+          </label>
+          <select 
+            @change="updateDeliveryCost($event)" 
+            name="district" 
+            id="district" 
+            required 
+            class="border outline-black bg-white outline-offset-2 focus:border-transparent px-4 py-2 w-full"
+          >
+            <option value="" selected>--select district--</option>
+            {% for district in districts %}
+            <option value="{{district}}">{{district}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <label for="address" class="flex">
+            Full address<span class="required">*</span>
+          </label>
+          <textarea
+            class="border outline-black outline-offset-2 focus:border-transparent p-2 h-24 w-full"
+            name="address"
+            id="address"
+            placeholder="Enter your full address..."
+            required
+          ></textarea>
+          <small class="text-gray-500">thana/upazila, road/village/area, post office, house/flat no.</small>
+        </div>
+    </div>
+    </div>
+  </section>
+  
+  <section class="md:max-w-[400px] mb-6 mx-auto w-full">
+    <div>
+      <div class="border px-4 py-5 shadow-md">
+        <p class="font-bold">ORDER SUMMARY</p>
+        <div class="border-b flex justify-between py-5">
+          <p>Subtotal</p>
+          <p>{{subtotal|taka}}</p>
+        </div>
+        <div class="border-b flex justify-between py-5">
+          <p>Delivery</p>
+          <p x-text="deliveryCost"></p>
+        </div>
+        <div class="flex justify-between py-5">
+          <p>Total</p>
+          <div class="font-semibold text-lg" ><span x-text="totalCost"></span><span> ৳</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <div class="flex items-center justify-between w-full">
+    <a href="{% url "products" %}" class="text-sm text-gray-700 hover:text-black">
+      ← Back to the shop
+    </a>
+    <button type="submit" class="bg-black text-white px-4 py-2">
+      Place an order
+    </button>
+  </div>
+</form>
+
+{% endblock main_content %}
