@@ -2,16 +2,15 @@
 {% block main_content %}
 {% load nix %}
 
-<section style="min-height: calc(100vh - 162px);">
-  <div class="container mx-auto p-4 lg:p-12 my-16 flex flex-col items-center justify-center">
+<section class="relative">
+  <div class="container mx-auto px-4 py-28 flex flex-col items-center justify-center">
     <h1 class="text-4xl text-black font-bold text-center mb-5">Wear your profession</h1>
     <p class="text-gray-700 text-center text-lg mb-8">Show your profession with our premium quality T-Shirts.</p>
     <a href="{% url "products" %}" class="bg-black text-white hover:bg-white hover:text-black active:border-transparent active:bg-black active:text-white py-3 px-5 border-2 border-black transition">Shop Now</a>
   </div>
-  <div class="bg relative text-gray-200">
+  <div class="bg relative text-gray-100 max-w-[1200px] -mt-20 mx-auto">
     {% include "partials/hero_bg.html" %}
   </div>
-    
 </section>
 
 <section class="container mb-16">

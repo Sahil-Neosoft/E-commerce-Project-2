@@ -5,15 +5,20 @@
 
 
 {% block content %}
-    {% include "partials/header_top.html" %}
-    {% include "partials/header.html" %}
-    {% include "partials/alert.html" %}
+    <div x-data="{ isLoading: true }" x-init="window.onload = () => { isLoading = false }">
+        <div x-show='isLoading' class="spinner"></div>
+        <div x-show='!isLoading' style="display: none;">
+            {% include "partials/header_top.html" %}
+            {% include "partials/header.html" %}
+            {% include "partials/alert.html" %}
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        {% block main_content %}
-        <!-- Main content goes here -->
-        {% endblock main_content %}
-    </main>
-
-    {% include "partials/footer.html" %}
+            <main class="max-w-7xl mx-auto px-4 py-8">
+                {% block main_content %}
+                <!-- Main content goes here -->
+                {% endblock main_content %}
+            </main>
+            {% include "partials/footer.html" %}
+        </div>
+    </div>
+    
 {% endblock content %}

@@ -2,6 +2,7 @@
 {% load nix %} 
 {% block title %}Checkout - Nixagone{% endblock title %} 
 {% block main_content %}
+  {% include "partials/heading.html" with title="Checkout" %}
 <form action="{% url "checkout" %}" method="post"
 x-data="{
     deliveryCost: 'select a district',
@@ -20,17 +21,16 @@ x-data="{
         }
     }
 }" 
-  class="container lg:flex lg:flex-col lg:py-10 max-w-[1200px] mx-auto py-5"
+  class="container flex flex-col md:flex-row gap-6 lg:py-10 max-w-[1200px] mx-auto py-5"
 >
 {% csrf_token %}
-  {% include "partials/heading.html" with title="Checkout" %}
   <section class="gap-3 grid grid-cols-1 max-w-[1200px] mb-6 w-full">
-    <div class="py-5">
+    <div class="">
       <div class="flex flex-col gap-3 w-full">
         <div class="flex gap-2 justify-between w-full">
           <div class="flex flex-col w-1/2">
             <label class="flex" for="name">
-              Full Name<span class="required">*</span>
+              Full Name<span class="required"></span>
             </label>
             <input
               class="border outline-black outline-offset-2 focus:border-transparent px-4 py-2 w-full"
@@ -44,7 +44,7 @@ x-data="{
           </div>
           <div class="flex flex-col w-1/2">
             <label class="flex" for="phone">
-              Phone<span class="required">*</span>
+              Phone<span class="required"></span>
             </label>
             <input
               class="border outline-black outline-offset-2 focus:border-transparent px-4 py-2 w-full"
@@ -72,7 +72,7 @@ x-data="{
         </div>
         <div class="flex flex-col w-full">
           <label class="flex" for="district">
-            District <span class="required">*</span>
+            District <span class="required"></span>
           </label>
           <select 
             @change="updateDeliveryCost($event)" 
@@ -89,7 +89,7 @@ x-data="{
         </div>
         <div class="flex flex-col">
           <label for="address" class="flex">
-            Full address<span class="required">*</span>
+            Full address<span class="required"></span>
           </label>
           <textarea
             class="border outline-black outline-offset-2 focus:border-transparent p-2 h-24 w-full"
@@ -104,9 +104,9 @@ x-data="{
     </div>
   </section>
   
-  <section class="md:max-w-[400px] mb-6 mx-auto w-full">
+  <section class="md:max-w-[400px] mx-auto w-full">
     <div>
-      <div class="border px-4 py-5 shadow-md">
+      <div class="border px-4 py-5 mb-6 shadow-md">
         <p class="font-bold">ORDER SUMMARY</p>
         <div class="border-b flex justify-between py-5">
           <p>Subtotal</p>
@@ -122,16 +122,17 @@ x-data="{
         </div>
       </div>
     </div>
+    <div class="flex items-center justify-between w-full">
+        <a href="{% url "products" %}" class="text-sm text-gray-700 hover:text-black">
+        ← Back to the shop
+        </a>
+        <button type="submit" class="bg-black text-white px-4 py-2">
+        Place an order
+        </button>
+    </div>
   </section>
   
-  <div class="flex items-center justify-between w-full">
-    <a href="{% url "products" %}" class="text-sm text-gray-700 hover:text-black">
-      ← Back to the shop
-    </a>
-    <button type="submit" class="bg-black text-white px-4 py-2">
-      Place an order
-    </button>
-  </div>
+  
 </form>
 
 {% endblock main_content %}
