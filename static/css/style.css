@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Inter', sans-serif;
 }
@@ -162,6 +166,18 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.spinner-sm {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #111;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+
+
 @keyframes spin {
     0% { transform: translate(-50%, -50%) rotate(0deg); }
     100% { transform: translate(-50%, -50%) rotate(360deg); }

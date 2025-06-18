@@ -5,9 +5,13 @@
 
 
 {% block content %}
-    <div x-data="{ isLoading: true }" x-init="window.onload = () => { isLoading = false }">
-        <div x-show='isLoading' class="spinner"></div>
-        <div x-show='!isLoading' style="display: none;">
+
+    <style>
+        
+    </style>
+    <div>
+        <div class="spinner"></div>
+        <div id='main-content' style="display: none;">
             {% include "partials/header_top.html" %}
             {% include "partials/header.html" %}
             {% include "partials/alert.html" %}

@@ -11,19 +11,24 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
+from os import getenv, path
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_-*2q_otr-q*^2%-=4y=op!_j*t-^vf%u5quxz5&#zg78x9n(='
+SECRET_KEY = getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -90,6 +95,14 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# postgress
+# DATABASE_URL = getenv('DATABASE_URL')
+
+# DATABASES = {
+#     'default': dj_database_url.config(default=DATABASE_URL)
+# }
 
 
 # Password validation
