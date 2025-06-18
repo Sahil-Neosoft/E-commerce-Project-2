@@ -131,7 +131,7 @@ class OrderItem(models.Model):
     color = models.ForeignKey(Color, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.order.order_number} - {self.product.name} x {self.quantity}"
+        return f"{self.order.order_number} - {self.product.name}(size: {self.size}, color: {self.color}) x {self.quantity}"
 
     def get_total_price(self):
         """Calculate total price for this order item"""

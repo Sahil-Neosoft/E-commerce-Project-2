@@ -9,3 +9,9 @@ def index(request):
         "featured_products": featured_products
     }
     return render(request, 'index.html', context)
+
+def about(request):
+    return render(request, 'main/about.html')
+
+def contact(request):
+    return render(request, 'main/contact.html')

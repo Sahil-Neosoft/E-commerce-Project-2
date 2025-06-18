@@ -87,22 +87,22 @@ class ImageInline(admin.TabularInline):
     image_preview.short_description = "Preview"
 
 
-# class CartItemInline(admin.TabularInline):
-#     model = CartItem
-#     extra = 0
-#     fields = ('product', 'quantity', 'size', 'color', 'total_price')
-#     readonly_fields = ('total_price',)
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    fields = ('product', 'quantity', 'size', 'color', 'total_price')
+    readonly_fields = ('total_price',)
 
-#     def total_price(self, obj):
-#         return f"${obj.get_total_price():.2f}"
-#     total_price.short_description = "Total"
+    def total_price(self, obj):
+        return f"${obj.get_total_price():.2f}"
+    total_price.short_description = "Total"
 
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     fields = ('product', 'quantity', 'size', 'color', 'item_total')
-    readonly_fields = fields
+    readonly_fields = ('item_total',)
 
     def item_total(self, obj):
         return f"${obj.get_total_price():.2f}"
@@ -263,6 +263,8 @@ class CartAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email', 'session_id')
     readonly_fields = ('total_items', 'total_value', 'created_at')
     
+    inlines = [CartItemInline]
+
     def user_info(self, obj):
         if obj.user:
             return f"{obj.user.username} ({obj.user.email})"
@@ -278,22 +280,22 @@ class CartAdmin(admin.ModelAdmin):
     total_value.short_description = "Total Value"
 
 
-# @admin.register(CartItem)
-# class CartItemAdmin(admin.ModelAdmin):
-#     list_display = ('cart_user', 'product', 'quantity', 'size', 'color', 'total_price')
-#     readonly_fields = list_display
-#     list_filter = ('cart__created_at', 'product__category')
-#     search_fields = ('product__name', 'cart__user__username')
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('cart_user', 'product', 'quantity', 'size', 'color', 'total_price')
+    readonly_fields = list_display
+    list_filter = ('cart__created_at', 'product__category')
+    search_fields = ('product__name', 'cart__user__username')
 
-#     def cart_user(self, obj):
-#         if obj.cart.user:
-#             return obj.cart.user.username
-#         return f"Guest: {obj.cart.session_id}"
-#     cart_user.short_description = "User"
+    def cart_user(self, obj):
+        if obj.cart.user:
+            return obj.cart.user.username
+        return f"Guest: {obj.cart.session_id}"
+    cart_user.short_description = "User"
 
-#     def total_price(self, obj):
-#         return f"${obj.get_total_price():.2f}"
-#     total_price.short_description = "Total"
+    def total_price(self, obj):
+        return f"${obj.get_total_price():.2f}"
+    total_price.short_description = "Total"
 
 
 @admin.register(Order)
@@ -303,7 +305,7 @@ class OrderAdmin(admin.ModelAdmin):
         'total_amount', 'total_items', 'created_at'
     )
     list_filter = ('status', 'payment_status', OrderStatusFilter, 'created_at')
-    search_fields = ('order_number', 'user__username', 'address__email')
+    search_fields = ('order_number', 'user__username', 'user__email')
     readonly_fields = (
         'order_number', 'user_info', 
         'total_amount', 'total_items', 'created_at'

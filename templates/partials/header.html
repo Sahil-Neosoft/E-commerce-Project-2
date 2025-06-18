@@ -10,8 +10,8 @@ x-data="{
         navLinks: [
             { name: 'Home', href: '{% url "index" %}'},
             { name: 'Products', href: '{% url "products" %}' },
-            { name: 'About', href: '#' },
-            { name: 'Contact', href: '#' }
+            { name: 'About', href: '{% url "about" %}' },
+            { name: 'Contact', href: '{% url "contact" %}' }
         ],
         activeLink: window.location.pathname
     }">
