@@ -91,7 +91,7 @@ class Size(models.Model):
         unique_together = ('product', 'name')
 
     def __str__(self):
-        return f"{self.product.name} - {self.name}"
+        return f"{self.name}"
 
 
 class Color(models.Model):
@@ -103,7 +103,7 @@ class Color(models.Model):
         unique_together = ('product', 'name')
 
     def __str__(self):
-        return f"{self.product.name} - {self.name}"
+        return f"{self.name}"
 
 
 class Image(models.Model):

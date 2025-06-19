@@ -5,11 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My E-commerce Site{% endblock %}</title>
-    {% comment %} <script src="{% static "js/tailwindcss.js" %}"></script> {% endcomment %}
-    <script src="{% static "js/alpine.js" %}" defer></script>
+    <title>{% block title %}{% endblock %}</title>
+    {% comment %} <script src="https://cdn.tailwindcss.com"></script> {% endcomment %}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="shortcut icon" href="{% static "img/logo.svg" %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static "css/style.css" %}">
+    {% block meta_description %}{% endblock meta_description %}
     {% block head %}{% endblock %}
     {% block style %}{% endblock style %}
 </head>

@@ -1,22 +1,14 @@
 {% extends "base.html" %}
-
-{% block title %}Nixagone{% endblock title %}
-
-
-
+{% block title %}{% endblock title %}
 {% block content %}
 
-    <style>
-        
-    </style>
     <div>
         <div class="spinner"></div>
         <div id='main-content' style="display: none;">
             {% include "partials/header_top.html" %}
             {% include "partials/header.html" %}
             {% include "partials/alert.html" %}
-
-            <main class="max-w-7xl mx-auto px-4 py-8">
+            <main class="max-w-7xl mx-auto px-4 md:py-8 py-4">
                 {% block main_content %}
                 <!-- Main content goes here -->
                 {% endblock main_content %}

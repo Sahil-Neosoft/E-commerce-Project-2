@@ -87,6 +87,9 @@ def add_to_cart(request):
             size=size,
             color=color
         )
+        if request.POST.get('next') == 'checkout':
+            return redirect('checkout')
+
         messages.success(request, f'{product.name} added to cart.')
         return redirect('product_detail', slug=product.slug)
     except Exception as e:
