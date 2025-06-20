@@ -223,23 +223,6 @@ def get_category_tree():
 
 
 @register.simple_tag
-def get_price_range(category=None):
-    """Get min and max prices for products"""
-    queryset = Product.objects.filter(is_active=True)
-    if category:
-        queryset = queryset.filter(category=category)
-    
-    result = queryset.aggregate(
-        min_price=models.Min('price'),
-        max_price=models.Max('price')
-    )
-    
-    return {
-        'min': result['min_price'] or 0,
-        'max': result['max_price'] or 0
-    }
-
-@register.simple_tag
 def stock_status(product, show_stock_count=False):
     """Return HTML badge for stock status"""
     if product.stock_quantity == 0:
@@ -422,10 +405,13 @@ def set_var(context, name, value):
 
 
 @register.simple_tag
-def get_setting(name, default=None):
+def config(name, default=None):
     """Get Django setting value"""
-    from django.conf import settings
-    return getattr(settings, name, default)
+    from main.models import Config
+    config = Config.objects.first()
+    if config:
+        return getattr(config, name, default)
+    return default
 
 
 @register.simple_tag

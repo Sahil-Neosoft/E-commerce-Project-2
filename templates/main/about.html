@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
-{% block title %} About - Nixagone {% endblock title %}
+{% load nix %}
+{% block title %} About - {% config "site_title" %} {% endblock title %}
 
 {% block main_content %}
-<button class="bg-pink-500 hover:p-4">hello</button>
+<div class="py-12 max-w-xl mx-auto">
+    {% include "partials/heading.html" with title="About" %}
+    {{about_page|safe}}
+</div>
 {% endblock main_content %}
-

@@ -5,9 +5,9 @@
     <div class="w-full aspect-square bg-gray-100">
         <a href="{{ product.get_absolute_url }}" class="block w-full h-full">
             {% if product.get_primary_image_url %}
-                <img src="{{ product.get_primary_image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                <img src="{{ product.get_primary_image_url }}" alt="{{ product.name }}" loading="lazy" class="w-full h-full object-cover">
             {% else %}
-                <img src="https://placehold.co/150" alt="No image" class="w-full h-full object-cover">
+                <img src="https://placehold.co/150/?text=No+image?bg=ccc" alt="No image" class="w-full h-full object-cover">
             {% endif %}
         </a>
     </div>

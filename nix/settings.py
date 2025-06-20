@@ -32,7 +32,7 @@ DEBUG = getenv('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://ca85-103-133-205-245.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://0.0.0.0:8000',]
 
 AUTH_USER_MODEL = 'main.User'
 
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'robots',
 
     # My Apps
     'apps.product.apps.ProductConfig',
@@ -55,6 +57,8 @@ INSTALLED_APPS = [
 
     'main.apps.MainConfig'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -153,8 +157,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Custom Settings
-
-SHIPPING_COST_DHAKA = 80
-SHIPPING_COST = 120

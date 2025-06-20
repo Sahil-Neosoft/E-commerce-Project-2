@@ -151,7 +151,7 @@
           </div>
           <div class="border-b py-5">
             <p>Delivery Charges</p>
-            <p class="text-sm mt-2">{{80|taka}} inside Dhaka, {{120|taka}} outside Dhaka</p>
+            <p class="text-sm mt-2">{% config "delivery_cost_dhaka" %} ৳ inside Dhaka, {% config "delivery_cost" %} ৳ outside Dhaka</p>
           </div>
           <a href="{% url "checkout" %}">
             <button class="bg-black px-5 py-2 text-white w-full">

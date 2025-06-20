@@ -1,12 +1,8 @@
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
 from .models import Order, Address
-from apps.product.models import Product, Size, Color
-from apps.cart.models import CartItem
+from main.models import Config
 from apps.cart.views import get_or_create_cart
 from .districts import districts
 
@@ -47,7 +43,8 @@ def checkout_view(request):
             address=address,
         )
         # Calculate shipping 
-        shipping_cost = settings.SHIPPING_COST_DHAKA if district == 'Dhaka' else settings.SHIPPING_COST 
+        config = Config.objects.first()
+        shipping_cost = config.delivery_cost_dhaka if district == 'Dhaka' else config.delivery_cost
         
         # Create order
         order = Order.create_from_cart(cart, address, shipping_cost)

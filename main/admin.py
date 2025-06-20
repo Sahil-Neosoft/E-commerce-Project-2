@@ -1,20 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from django.urls import reverse
-from django.utils.safestring import mark_safe
-from django.db.models import Count, Sum
+from django.db.models import Count
 from django.contrib.admin import SimpleListFilter
 from apps.product.models import Product, Category, Size, Color, Image
-from apps.order.models import Order, OrderItem
+from apps.order.models import Order, OrderItem, Address
 from apps.cart.models import Cart, CartItem
-from .models import User
+from .models import User, Config
 
 
 # Custom Admin Site Configuration
-admin.site.site_header = "E-commerce Admin Dashboard"
-admin.site.site_title = "E-commerce Admin"
-admin.site.index_title = "Welcome to E-commerce Administration"
+admin.site.site_header = "Admin Dashboard"
+admin.site.site_title = "Admin"
 
 
 # Custom Filters
@@ -87,15 +84,15 @@ class ImageInline(admin.TabularInline):
     image_preview.short_description = "Preview"
 
 
-# class CartItemInline(admin.TabularInline):
-#     model = CartItem
-#     extra = 0
-#     fields = ('product', 'quantity', 'size', 'color', 'total_price')
-#     readonly_fields = ('total_price',)
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    fields = ('product', 'quantity', 'size', 'color', 'total_price')
+    readonly_fields = fields
 
-#     def total_price(self, obj):
-#         return f"${obj.get_total_price():.2f}"
-#     total_price.short_description = "Total"
+    def total_price(self, obj):
+        return f"${obj.get_total_price():.2f}"
+    total_price.short_description = "Total"
 
 
 class OrderItemInline(admin.TabularInline):
@@ -122,6 +119,7 @@ class UserAdmin(BaseUserAdmin):
     )
 
     def get_queryset(self, request):
+        
         return super().get_queryset(request).annotate(
             order_count=Count('orders')
         )
@@ -148,18 +146,18 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
         'primary_image_preview', 'name', 'category', 'price', 'stock_status', 'stock_quantity', 
-        'is_active'
+        'is_active', 'is_featured'
     )
     list_filter = ('is_active', 'category', StockLevelFilter, 'created_at')
     search_fields = ('name', 'sku', 'description')
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('created_at', 'updated_at', 'primary_image_preview')
-    list_editable = ('price', 'stock_quantity', 'is_active')
-    list_per_page = 25
+    list_editable = ('price', 'stock_quantity', 'is_active', 'is_featured')
+    list_per_page = 10
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'slug', 'category', 'sku', 'is_active')
+            'fields': ('name', 'slug', 'category', 'sku', 'is_active', 'is_featured')
         }),
         ('Content', {
             'fields': ('short_description', 'description')
@@ -258,11 +256,12 @@ class ImageAdmin(admin.ModelAdmin):
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_info', 'total_items', 'total_value', 'created_at')
-    readonly_fields = list_display
+    readonly_fields = ('session_id', 'user', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('user__username', 'user__email', 'session_id')
     readonly_fields = ('total_items', 'total_value', 'created_at')
     
+    inlines = [CartItemInline]
     def user_info(self, obj):
         if obj.user:
             return f"{obj.user.username} ({obj.user.email})"
@@ -278,52 +277,53 @@ class CartAdmin(admin.ModelAdmin):
     total_value.short_description = "Total Value"
 
 
-# @admin.register(CartItem)
-# class CartItemAdmin(admin.ModelAdmin):
-#     list_display = ('cart_user', 'product', 'quantity', 'size', 'color', 'total_price')
-#     readonly_fields = list_display
-#     list_filter = ('cart__created_at', 'product__category')
-#     search_fields = ('product__name', 'cart__user__username')
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    list_display = ('cart_user', 'product', 'quantity', 'size', 'color', 'total_price')
+    readonly_fields = ('cart','cart_user', 'product', 'quantity', 'size', 'color', 'total_price')
+    list_filter = ('cart__created_at', 'product__category')
+    search_fields = ('product__name', 'cart__user__username')
 
-#     def cart_user(self, obj):
-#         if obj.cart.user:
-#             return obj.cart.user.username
-#         return f"Guest: {obj.cart.session_id}"
-#     cart_user.short_description = "User"
+    def cart_user(self, obj):
+        if obj.cart.user:
+            return obj.cart.user.username
+        return f"Guest: {obj.cart.session_id}"
+    cart_user.short_description = "User"
 
-#     def total_price(self, obj):
-#         return f"${obj.get_total_price():.2f}"
-#     total_price.short_description = "Total"
+    def total_price(self, obj):
+        return f"${obj.get_total_price():.2f}"
+    total_price.short_description = "Total"
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    list_per_page = 10
     list_display = (
-        'order_number', 'user_info', 'status', 'payment_status', 
-        'total_amount', 'total_items', 'created_at'
+        'order_number', 'created_at', 'user_info', 'status', 
+        'total_amount', 'total_items'
     )
-    list_filter = ('status', 'payment_status', OrderStatusFilter, 'created_at')
+    list_filter = ('status', OrderStatusFilter, 'created_at')
     search_fields = ('order_number', 'user__username', 'address__email')
     readonly_fields = (
-        'order_number', 'user_info', 
-        'total_amount', 'total_items', 'created_at'
+        'user', 'order_number', 'user_info', 
+        'total_amount', 'subtotal', 'total_items', 'created_at', 'shipping_cost', 'address'
     )
-    list_editable = ('status', 'payment_status')
+    list_editable = ('status',)
     date_hierarchy = 'created_at'
     
     fieldsets = (
         ('Order Information', {
-            'fields': ('order_number', 'user', 'status', 'payment_status')
+            'fields': ('order_number', 'user', 'status')
         }),
         ('Financial Details', {
             'fields': ('subtotal', 'shipping_cost', 'total_amount')
         }),
         ('Shipping Information', {
-            'fields': ('address', 'shipped_at')
+            'fields': ('address',)
         }),
         ('Timestamps', {
             'fields': ('created_at',),
-            'classes': ('collapse',)
         }),
     )
     
@@ -364,6 +364,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
+    list_per_page = 10
     list_display = ('order_number', 'product', 'quantity', 'size', 'color', 'item_total')
     list_filter = ('order__status', 'order__created_at', 'product__category')
     search_fields = ('order__order_number', 'product__name')
@@ -379,8 +380,8 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 # Dashboard customization
 class EcommerceAdminSite(admin.AdminSite):
-    site_header = "E-commerce Admin Dashboard"
-    site_title = "E-commerce Admin"
+    site_header = "Admin Dashboard"
+    site_title = "Admin"
     index_title = "Dashboard Overview"
 
     def index(self, request, extra_context=None):
@@ -414,3 +415,5 @@ class EcommerceAdminSite(admin.AdminSite):
         extra_context['dashboard_stats'] = stats
         
         return super().index(request, extra_context)
+    
+admin.site.register(Config)
