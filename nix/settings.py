@@ -30,9 +30,9 @@ SECRET_KEY = getenv('SECRET_KEY')
 
 DEBUG = getenv('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [ '127.0.0.1', '0.0.0.0', 'nixagone.pythonanywhere.com']
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://0.0.0.0:8000',]
+CSRF_TRUSTED_ORIGINS = ['https://nixagone.pythonanywhere.com', 'http://127.0.0.1:8000', 'http://0.0.0.0:8000',]
 
 AUTH_USER_MODEL = 'main.User'
 
