@@ -6,5 +6,7 @@ urlpatterns = [
     path('checkout/', checkout_view, name='checkout'),
     path('confirmation/<str:order_number>/', confirmation, name='confirmation'),
     path('<int:pk>/', order_detail, name='order_detail'),
+
+    path("my-orders/", MyOrdersView.as_view(), name="my_orders"),
     # path('<int:pk>/cancel/', order_cancel, name='order_cancel'),
 ]

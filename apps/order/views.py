@@ -5,6 +5,8 @@ from .models import Order, Address
 from main.models import Config
 from apps.cart.views import get_or_create_cart
 from .districts import districts
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
 
 def checkout_view(request):
     """Checkout process"""
@@ -116,3 +118,28 @@ def cancel_order(request, order_number):
         messages.error(request, 'This order cannot be cancelled.')
     
     return redirect('order_detail', order_number=order.order_number)
+
+
+
+
+
+class MyOrdersView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = "order/my_orders.html"
+    context_object_name = "orders"
+    paginate_by = 10  # Paginate for performance and UX
+
+    def get_queryset(self):
+        return (
+            Order.objects.select_related("address")
+            .prefetch_related("items__product", "items__size", "items__color")
+            .filter(user=self.request.user)
+            .order_by("-created_at")
+        )
+
+
+
+
+
+
+
