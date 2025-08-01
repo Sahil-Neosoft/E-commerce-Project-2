@@ -38,7 +38,7 @@ media/          # Uploaded product images
 ### 1. Clone & Install
 
 ```sh
-git clone https://github.com/ssshiponu/nixagone
+git clone https://github.com/Sahil-Neosoft/E-commerce-Project-2.git
 cd nixagone
 python -m venv venv
 source venv/bin/activate
