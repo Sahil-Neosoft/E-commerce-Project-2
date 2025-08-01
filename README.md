@@ -1,4 +1,4 @@
-# Nixagone
+# E-commerce-Project-2
 
 Nixagone is a modern, customizable e-commerce web application built with Django. It features a clean UI, robust product management, cart and order handling, and is ready for deployment on platforms like PythonAnywhere.
 
